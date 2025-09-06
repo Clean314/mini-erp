@@ -2,7 +2,7 @@ package main
 
 import (
 	"mini-erp/internal/db"
-
+	"mini-erp/internal/routes"
 	"github.com/gin-gonic/gin"
 )
 

@@ -18,5 +18,6 @@ func InitDB() {
 		log.Fatal("DB 연결 실패:", err)
 	}
 
-	DB.AutoMigrate(&models.User{}, &models.Project{})
+	DB.AutoMigrate(&models.User{}, &models.Project{}, &models.Task{})
+
 }
