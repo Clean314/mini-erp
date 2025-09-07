@@ -1,9 +1,8 @@
 package db
 
 import (
-	"mini-erp/internal/models"
 	"os"
-
+	"mini-erp/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

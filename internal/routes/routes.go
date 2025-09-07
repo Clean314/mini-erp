@@ -4,6 +4,7 @@ import (
     "github.com/gin-gonic/gin"
     "mini-erp/internal/handlers"
     "mini-erp/internal/middlewares"
+	"gorm.io/gorm"
 )
 
 func RegisterRoutes(r *gin.Engine, db *gorm.DB) {

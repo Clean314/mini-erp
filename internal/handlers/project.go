@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strconv"
 	"mini-erp/internal/models"
-	"mini-erp/internal/db"
+	"gorm.io/gorm"
 )
 
-func CreateProject(c *gin.Context) gin.HandlerFunc {
+func CreateProject(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var project models.Project
 		if err := c.ShouldBindJSON(&project); err != nil {
@@ -35,8 +35,10 @@ func GetProjects(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func DeleteProject(c *gin.Context) {
-    id, _ := strconv.Atoi(c.Param("id"))
-    db.DB.Delete(&models.Project{}, id)
-    c.JSON(http.StatusOK, gin.H{"message": "프로젝트 삭제됨"})
+func DeleteProject(db *gorm.DB) gin.HandlerFunc {
+    return func(c *gin.Context) {
+        id, _ := strconv.Atoi(c.Param("id"))
+        db.Delete(&models.Project{}, id)
+        c.JSON(http.StatusOK, gin.H{"message": "프로젝트 삭제됨"})
+    }
 }

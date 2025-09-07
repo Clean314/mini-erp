@@ -4,7 +4,6 @@ import (
 	"log"
 	"mini-erp/internal/db"
 	"mini-erp/internal/routes"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,7 +14,7 @@ func main() {
 	}
 
 	r := gin.Default()
-	routes.SetupRoutes(r, database)
+	routes.RegisterRoutes(r, database)
 
 	r.Run(":8080")
 }
