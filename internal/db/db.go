@@ -1,23 +1,25 @@
 package db
 
 import (
-	"log"
-	"mini-erp/internal/models"
+	"mini-promise/internal/models"
+	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
-
-func InitDB() {
-	dsn := "host=db user=admin password=admin dbname=mini-erp port=5432 sslmode=disable"
-	var err error
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+func Connect() (*gorm.DB, error) {
+	dsn := "host=" + os.Getenv("DB_HOST") +
+		" user=" + os.Getenv("DB_USER") +
+		" password=" + os.Getenv("DB_PASSWORD") +
+		" dbname=" + os.Getenv("DB_NAME") +
+		" port=5432 sslmode=disable"
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatal("DB 연결 실패:", err)
+		return nil, err
 	}
 
-	DB.AutoMigrate(&models.User{}, &models.Project{}, &models.Task{})
+	db.AutoMigrate(&models.User{}, &models.Project{}, &models.Task{}, &models.Approval{})
 
+	return db, nil
 }

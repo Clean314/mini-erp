@@ -1,60 +1,33 @@
-package handlers
+package middlewares
 
 import (
-	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
-	
-	"mini-erp/internal/models"
-	"mini-erp/internal/db"
+	"strings"
+
+	"github.com/gin-gonic/gin"
 )
 
-var SecretKey = []byte("cnvuiqawhrh38hhkasbfb")
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "no token"})
+			c.Abort()
+			return
+		}
 
-func Register(c *gin.Context) {
+		token := strings.TrimPrefix(authHeader, "Bearer ")
+		if token == "admin-token" {
+			c.Set("userID", uint(1))
+			c.Set("role", "ADMIN")
+		} else if token == "manager-token" {
+			c.Set("userID", uint(2))
+			c.Set("role", "MANAGER")
+		} else {
+			c.Set("userID", uint(3))
+			c.Set("role", "USER")
+		}
 
-	var input sturct {
-		Username string `json:"username" binding:"required"`
-		Password string `json:"password" binding:"required"`
+		c.Next()
 	}
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	hashed, _ := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
-	user := models.User{
-		Username: input.Username,
-		Password: string(hashed),
-	}
-
-	db.DB.Create(&user)
-	c.JSON(http.StatusOK, gin.H{"message": "회원가입 성공"})
-}
-
-func Login(c *gin.Context) {
-	var input struct {
-		Username string `json:"username" binding:"required"`
-		Password string `json:"password" binding:"required"`
-	}
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	var user models.User
-	db.DB.Where("username = ?", input.Username).First(&user)
-
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password)); err != nil {
-        c.JSON(http.StatusUnauthorized, gin.H{"error": "잘못된 비밀번호입니다."})
-        return
-    }
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-        "user_id": user.ID,
-        "expire":     time.Now().Add(time.Hour * 72).Unix(),
-    })
-    tokenStr, _ := token.SignedString(SecretKey)
-
-    c.JSON(http.StatusOK, gin.H{"token": tokenStr})
 }

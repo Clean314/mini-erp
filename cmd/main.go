@@ -1,17 +1,21 @@
 package main
 
 import (
-	"mini-erp/internal/db"
-	"mini-erp/internal/routes"
+	"log"
+	"mini-promise/internal/db"
+	"mini-promise/internal/routes"
+
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	db.InitDB()
+	database, err := db.Connect()
+	if err != nil {
+		log.Fatal("DB 연결 실패:", err)
+	}
 
 	r := gin.Default()
-
-	routes.RegisterRoutes(r)
+	routes.SetupRoutes(r, database)
 
 	r.Run(":8080")
 }

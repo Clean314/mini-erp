@@ -22,5 +22,9 @@ func RegisterRoutes(r *gin.Engine) {
 		auth.GET("/projects/:projectId/tasks", handlers.GetTasksByProject)
 		auth.PUT("/tasks/:id/status", handlers.UpdateTaskStatus)
 		auth.DELETE("/tasks/:id", handlers.DeleteTask)
+
+        api.POST("/approvals", middlewares.RoleMiddleware("USER", "MANAGER", "ADMIN"), handlers.CreateApproval(db))
+        api.POST("/approvals/:id/approve", middlewares.RoleMiddleware("MANAGER", "ADMIN"), handlers.ApproveApproval(db))
+        api.POST("/approvals/:id/reject", middlewares.RoleMiddleware("MANAGER", "ADMIN"), handlers.RejectApproval(db))
     }
 }
