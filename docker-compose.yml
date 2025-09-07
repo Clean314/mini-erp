@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:14
+    container_name: mini_erp_db
+    restart: always
+    environment:
+      POSTGRES_USER: erp_user
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: mini_erp
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: mini_erp_backend
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: erp_user
+      DB_PASSWORD: password123
+      DB_NAME: mini_erp
+    ports:
+      - "8080:8080"
+
+volumes:
+  db_data:
