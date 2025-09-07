@@ -1,7 +1,7 @@
 package db
 
 import (
-	"mini-promise/internal/models"
+	"mini-erp/internal/models"
 	"os"
 
 	"gorm.io/driver/postgres"

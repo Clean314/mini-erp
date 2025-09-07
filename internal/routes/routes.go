@@ -2,29 +2,23 @@ package routes
 
 import (
     "github.com/gin-gonic/gin"
-    "mini-promise/internal/handlers"
-    "mini-promise/internal/middlewares"
+    "mini-erp/internal/handlers"
+    "mini-erp/internal/middlewares"
 )
 
-func RegisterRoutes(r *gin.Engine) {
-    // 인증
-    r.POST("/register", handlers.Register)
-    r.POST("/login", handlers.Login)
+func RegisterRoutes(r *gin.Engine, db *gorm.DB) {
+	api := r.Group("/api")
+	api.Use(middlewares.AuthMiddleware())
 
     // 인증 요구 API
-    auth := r.Group("/api", middlewares.AuthMiddleware())
-    {
-        auth.POST("/projects", handlers.CreateProject)
-        auth.GET("/projects", handlers.GetProjects)
-        auth.DELETE("/projects/:id", handlers.DeleteProject)
 
-		auth.POST("/tasks", handlers.CreateTask)
-		auth.GET("/projects/:projectId/tasks", handlers.GetTasksByProject)
-		auth.PUT("/tasks/:id/status", handlers.UpdateTaskStatus)
-		auth.DELETE("/tasks/:id", handlers.DeleteTask)
+	api.POST("/projects", middlewares.RoleMiddleware("USER", "MANAGER", "ADMIN"), handlers.CreateProject(db))
+	api.GET("/projects", middlewares.RoleMiddleware("USER", "MANAGER", "ADMIN"), handlers.GetProjects(db))
 
-        api.POST("/approvals", middlewares.RoleMiddleware("USER", "MANAGER", "ADMIN"), handlers.CreateApproval(db))
-        api.POST("/approvals/:id/approve", middlewares.RoleMiddleware("MANAGER", "ADMIN"), handlers.ApproveApproval(db))
-        api.POST("/approvals/:id/reject", middlewares.RoleMiddleware("MANAGER", "ADMIN"), handlers.RejectApproval(db))
-    }
+	api.POST("/tasks", middlewares.RoleMiddleware("USER", "MANAGER", "ADMIN"), handlers.CreateTask(db))
+	api.GET("/tasks", middlewares.RoleMiddleware("USER", "MANAGER", "ADMIN"), handlers.GetTasks(db))
+
+	api.POST("/approvals", middlewares.RoleMiddleware("USER", "MANAGER", "ADMIN"), handlers.CreateApproval(db))
+	api.POST("/approvals/:id/approve", middlewares.RoleMiddleware("MANAGER", "ADMIN"), handlers.ApproveApproval(db))
+	api.POST("/approvals/:id/reject", middlewares.RoleMiddleware("MANAGER", "ADMIN"), handlers.RejectApproval(db))
 }

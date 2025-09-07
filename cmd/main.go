@@ -2,8 +2,8 @@ package main
 
 import (
 	"log"
-	"mini-promise/internal/db"
-	"mini-promise/internal/routes"
+	"mini-erp/internal/db"
+	"mini-erp/internal/routes"
 
 	"github.com/gin-gonic/gin"
 )
